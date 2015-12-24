@@ -1,7 +1,6 @@
 import pandas as pd
 import re
 from datetime import datetime
-import os
 import datetime as DT
 import yaml
 
@@ -25,8 +24,7 @@ def getMonth(data):
     
 df['Created'] = df.Created.apply(getDate)
     
-df1 = df.drop_duplicates(cols='Name', take_last=False)
-df1 = df1.reset_index().drop('index', 1)
+df1 = df.drop_duplicates(cols='Name', take_last=False).reset_index().drop('index', 1)
 
 today = DT.date.today() #today's date
 dt = today - DT.timedelta(days=1) #wednesday date

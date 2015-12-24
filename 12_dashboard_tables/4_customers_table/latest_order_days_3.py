@@ -1,7 +1,6 @@
 import pandas as pd
 from datetime import datetime
 import time
-import os
 import yaml
 
 with open("config.yaml", 'r') as ymlfile:
@@ -20,16 +19,14 @@ def diffDates(data):
 #get required columns
 df1=df[['Email', 'Created at' ]]
 
-df1=df1.drop_duplicates()
-df1= df1.reset_index().drop('index',1)
+df1=df1.drop_duplicates().reset_index().drop('index',1)
 
 #rename columns
 df1.columns = ['Email', 'Date']
 
 df1['Date'] = df1.Date.apply(getDate)
 
-df1=df1.drop_duplicates()
-df1= df1.reset_index().drop('index',1)
+df1=df1.drop_duplicates().reset_index().drop('index',1)
 
 #get today's date in datetime format
 today = pd.to_datetime(datetime.strptime(time.strftime("%Y-%m-%d"), '%Y-%m-%d')).date()

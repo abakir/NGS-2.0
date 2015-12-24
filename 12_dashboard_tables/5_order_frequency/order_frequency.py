@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import os
 import yaml
 
 with open("config.yaml", 'r') as ymlfile:
@@ -8,27 +7,23 @@ with open("config.yaml", 'r') as ymlfile:
 
 df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"],low_memory=False)
 
-
 # take required fields
 df1=df[['Email', 'Created at' ]]
 
 #let there be only one row for each order
-df1=df1.drop_duplicates()
-df1= df1.reset_index().drop('index',1)
+df1=df1.drop_duplicates().reset_index().drop('index',1)
 
 #getting only date from created at field
 df1['Created at'] = df1.apply(lambda x: x['Created at'][:10], axis = 1)
     
-df1=df1.drop_duplicates()
-df1= df1.reset_index().drop('index',1)
+df1=df1.drop_duplicates().reset_index().drop('index',1)
 
 df1.columns=['Email', 'Date']
 df1['Difference'] = 0
 df1['Count'] = 0
 
 df1['Date'] =pd.to_datetime(df1.Date)
-df1=df1.sort(['Email', 'Date'])
-df1= df1.reset_index().drop('index',1)
+df1=df1.sort(['Email', 'Date']).reset_index().drop('index',1)
 
 n = 1
 for i in range(0,max(df1.index)):

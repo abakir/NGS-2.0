@@ -1,6 +1,5 @@
 import pandas as pd
 from datetime import datetime
-import os
 import yaml
 
 with open("config.yaml", 'r') as ymlfile:

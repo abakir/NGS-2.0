@@ -1,5 +1,4 @@
 import pandas as pd
-import os
 import yaml
 
 with open("config.yaml", 'r') as ymlfile:
