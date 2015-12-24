@@ -9,16 +9,8 @@ with open("config.yaml", 'r') as ymlfile:
 
 df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"])
 
-#get the first of the month
-def convertDate(data):
-    matchobj = re.match(r'(.*) (.*) (.*).*',data)
-    data = matchobj.group(1)
-    matchobj = re.match(r'(.*)-(.*)-(.*).*',data)
-    data = matchobj.group(1) + "-" + matchobj.group(2) + "-01"
-    return data
-    
-df = df[['Name', 'Email', 'Created at', 'Lineitem quantity', 'Lineitem price']]
 
+df = df[['Name', 'Email', 'Created at', 'Lineitem quantity', 'Lineitem price']]
 #calculate revenue
 df['Revenue'] = df.apply(lambda x: x['Lineitem quantity']*x['Lineitem price'], axis=1)
 
@@ -26,23 +18,7 @@ df['Revenue'] = df.apply(lambda x: x['Lineitem quantity']*x['Lineitem price'], a
 df = df[['Name', 'Email', 'Created at', 'Revenue']]
 df.columns = ['Name', 'Email', 'Date', 'Revenue']
 
-df['Date'] = df.Date.apply(convertDate)
-
-#create new data frames
-df5 = df[['Email', 'Date', 'Revenue']]
-df2 = df[['Name', 'Email', 'Date']]
-df2 = df2.drop_duplicates().reset_index().drop('index',1)
-
-#count total number of orders
-df2['Total orders'] = 1
-df5 = df5.groupby(['Email', 'Date'], as_index=False).sum()
-df2 = df2.groupby(['Email', 'Date'], as_index=False).sum()
-
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"])
-
-#get required columns and rename
-df = df[['Name', 'Email', 'Created at']]
-df.columns = ['Name', 'Email', 'Date']
+df['Date1'] = df['Date']
 
 #get date as day
 def getDay(data):
@@ -80,13 +56,37 @@ def getHours(data):
     elif(num >= 22):
         return 22
         
-df['Day'] = df.Date.apply(getDay)
-df['Hours'] = df.Date.apply(getHours)
+df['Day'] = df.Date1.apply(getDay)
+df['Hours'] = df.Date1.apply(getHours)
 
+df = df[['Name', 'Email', 'Date', 'Revenue', 'Day', 'Hours']]
+
+
+def convertDate(data):
+    matchobj = re.match(r'(.*) (.*) (.*).*',data)
+    data = matchobj.group(1)
+    return data
 df['Date'] = df.Date.apply(convertDate)
+df = df.sort('Date', ascending=False).reset_index().drop('index',1)
+
+today = DT.date.today()
+dt = today - DT.timedelta(days=7)
+i=0
+while (i <= max(df.index)):
+    if (str(df.loc[i, 'Date']) >= str(dt)): #compare dates
+        df.loc[i, 'Date'] = dt #set thursday date
+        i = i+1
+    else:
+        dt = dt - DT.timedelta(days=7)
+        i=i-1
+
 df = df.drop_duplicates().reset_index().drop('index',1)
 
-#create new df and initialize columns
+data = df[['Email', 'Date', 'Revenue']]
+df = df[['Email', 'Date', 'Day', 'Hours']]
+
+df = df.drop_duplicates().reset_index().drop('index',1)
+
 df1 = pd.DataFrame(columns = ['Email', 'Date', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22])
 df1['Email'] = df['Email']
 df1['Date'] = df['Date']
@@ -94,14 +94,21 @@ df1['Sunday'] = df1['Monday'] = df1['Tuesday'] = df1['Wednesday'] = df1['Thursda
 
 #assign values to hours and days columns
 for i in range(0, max(df.index)+1):
+    df1.loc[i,(df.iloc[i,2])] = 1
     df1.loc[i,(df.iloc[i,3])] = 1
-    df1.loc[i,(df.iloc[i,4])] = 1
     
 #count total orders per hours, days
 df1 = df1.groupby(['Email', 'Date'], axis = 0, as_index=False).sum()
 
 #rename columns
 df1.columns = ['Email', 'Date', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '0:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00', '6:00 - 8:00', '8:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00', '18:00 - 20:00', '20:00 - 22:00', '22:00 - 0:00']
+
+df5 = data[['Email', 'Date', 'Revenue']]
+df2 = data[['Email', 'Date']]
+df2 = df2.drop_duplicates().reset_index().drop('index',1)
+df2['Total orders'] = 1
+df5 = df5.groupby(['Email', 'Date'], as_index=False).sum()
+df2 = df2.groupby(['Email', 'Date'], as_index=False).sum()
 
 #join data frames
 df3 = df2.merge(df5, on = ['Email', 'Date'], how = 'inner')
@@ -138,4 +145,5 @@ customers['Address'] = customers['Address1'] + " " + customers['Address2'] + " "
 customers = customers[['Name', 'Address', 'Phone', 'Email']]
 
 df3 = customers.merge(df3, on = ['Email'], how = 'inner')
+
 df3.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_customer_dates'], index=False)
