@@ -62,23 +62,21 @@ df['Hours'] = df.Date1.apply(getHours)
 df = df[['Name', 'Email', 'Date', 'Revenue', 'Day', 'Hours']]
 
 
-def convertDate(data):
+def changeDate(data):
     matchobj = re.match(r'(.*) (.*) (.*).*',data)
-    data = matchobj.group(1)
-    return data
-df['Date'] = df.Date.apply(convertDate)
-df = df.sort('Date', ascending=False).reset_index().drop('index',1)
-
-today = DT.date.today()
-dt = today - DT.timedelta(days=7)
-i=0
-while (i <= max(df.index)):
-    if (str(df.loc[i, 'Date']) >= str(dt)): #compare dates
-        df.loc[i, 'Date'] = dt #set thursday date
-        i = i+1
-    else:
-        dt = dt - DT.timedelta(days=7)
-        i=i-1
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Wednesday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=6)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Tuesday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=5)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Monday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=4)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Sunday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=3)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Saturday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=2)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Friday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=1)
+df['Date'] = df.Date.apply(changeDate)
 
 df = df.drop_duplicates().reset_index().drop('index',1)
 
