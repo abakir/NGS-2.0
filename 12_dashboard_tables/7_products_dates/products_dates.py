@@ -1,120 +1,105 @@
 import pandas as pd
 from datetime import datetime
+import re
+import datetime as DT
 import yaml
 
 with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["ip_total_revenue_prod"])
+df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["ip_orders"], low_memory=False)
 
-df = df[[0,3,5]+range(7,len(df.columns)-5)]#reqd columns
-df = df[:max(df.index)-4] #reqd rows
+df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Lineitem quantity', 'Lineitem price']]
+df['Revenue'] = df['Lineitem quantity'] * df['Lineitem price']
 
-#remove null products, change to upper case
-df = df[pd.notnull(df['Product'])]
+df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Revenue']]
+df.columns = ['Product', 'SKU', 'Date', 'Revenue']
 df['Product'] = df['Product'].apply(lambda x: x.upper())
+df['SKU'] = df['SKU'].apply(lambda x: str(x).upper())
+prods = df[['Product', 'SKU', 'Revenue']]
+df['Date1'] = df['Date']
 
-df = df.sort('Product')
-df.fillna(0, inplace=True) #replace na values with 0
-df = df[~df['Product'].str.contains("CAIRO")] #remove unnecessary rows
-df = df.reset_index().drop('index',1)
-df = df.groupby(['Product', 'Brand', 'Type'], axis=0, as_index=False).sum()
+def changeDate(data):
+    matchobj = re.match(r'(.*) (.*) (.*).*',data)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Wednesday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=6)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Tuesday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=5)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Monday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=4)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Sunday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=3)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Saturday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=2)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Friday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=1)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Thursday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=0)
+df['Date'] = df.Date.apply(changeDate)
 
+df1 = df[['Product', 'SKU', 'Revenue', 'Date1']]
 
-prods = df['Product'].tolist()
-new_prods = []
-for i in prods:
-    for j in range(0, len(df.columns)-3):
-        new_prods.append(i) #add each product total products number of times
-        
-brands = df['Brand'].tolist()
-new_brands = []
-for i in brands:
-    for j in range(0, len(df.columns)-3):
-        new_brands.append(i) #add each brand total products number of times
-        
-types = df['Type'].tolist()
-new_types = []
-for i in types:
-    for j in range(0, len(df.columns)-3):
-        new_types.append(i) #add each type total products number of times
-        
-df1 = df[range(3,len(df.columns))]
-dates = df1.columns.tolist()
-new_dates = []
+def cutDate(data):
+    matchobj = re.match(r'(.*) (.*) (.*).*',data)
+    data = matchobj.group(1)
+    matchobj = re.match(r'(.*)-(.*)-(.*).*',data)
+    return matchobj.group(1) + "-" + matchobj.group(2) + "-01"
+df1['Date1'] = df1.Date1.apply(cutDate)
+
+df = df[['Product', 'SKU', 'Revenue', 'Date']]
+df = df.groupby(['Date','Product', 'SKU'], as_index=False).sum()
+df1 = df1.groupby(['Date1','Product', 'SKU'], as_index=False).sum()
+prods = prods.groupby(['Product', 'SKU'], as_index=False).sum()
+prods = prods.drop_duplicates().reset_index().drop('index',1)
+
+final = pd.DataFrame(columns = ['Product', 'SKU'] + df1['Date1'].drop_duplicates().tolist()+ ['Revenue'] )
+final[['Product']] = prods[['Product']]
+final[['Revenue']] = prods[['Revenue']]
+final[['SKU']] = prods[['SKU']]
+final.fillna(0, inplace=True)
+
+final['New'] = final.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
+df1['New'] = df1.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
+final = final.set_index('New')
+final.index.name = None
+
+for i in range(0, max(df1.index)+1):
+    final.loc[df1.loc[i, 'New'],df1.loc[i, 'Date1']] = df1.loc[i, 'Revenue']
+    
+final = final.reset_index().drop('index',1)
+
+for i in range(0,max(final.index)+1):
+    for j in range(2,len(final.columns)-1):
+        #To get the first non zero revenue month
+        if(final.iloc[i,j]!=0):
+            t=1
+            break
+    #TO get the total no of months        
+    n=len(final.columns)-1-j
+    m=n**(-1)
+    y=final.loc[i, 'Revenue']/final.iloc[i,j]
+    final.loc[i,'CMGR']=(pow(y,m)-1)*100
+    final.loc[i,'Period'] = n
+    
+final = final[['Product', 'SKU', 'CMGR', 'Period']]
+
+final['New'] = final.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
+df['New'] = df.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
+final = final.set_index('New')
+final.index.name = None
+
 for i in range(0, max(df.index)+1):
-    new_dates = new_dates + dates #add all dates total products number of times
+    df.loc[i, 'CMGR'] = final.loc[df.loc[i, 'New'], 'CMGR']
+    df.loc[i, 'Period'] = final.loc[df.loc[i, 'New'], 'Period']
     
-#create new df and initialize columns
-df2 = pd.DataFrame(columns=['Product', 'Brand', 'Type', 'Date'])
-df2['Product'] = new_prods
-df2['Brand'] = new_brands
-df2['Type'] = new_types
-df2['Date'] = new_dates
-
-#create a concatenated column and make index
-df2['New name'] = df2.apply(lambda x: str(x['Product']) +","+ str(x['Brand']) +","+ str(x['Type']), axis=1)
-df['New name'] = df.apply(lambda x: str(x['Product']) +","+ str(x['Brand']) +","+ str(x['Type']), axis=1)
-df = df.set_index('New name')
-df.index.name = None
-
-#retrieve revenue for each product date combination from old df
-for i in range(0, max(df2.index)+1):
-    df2.loc[i, 'Revenue'] = df.loc[df2.loc[i, 'New name'], df2.loc[i, 'Date']]
-    
-df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["ip_gross_profit_prod"])
-
-df = df[[0,3,5]+range(7,len(df.columns)-5)]#reqd columns
-df = df[:max(df.index)-4] #reqd rows
-
-#remove null products, change to upper case
-df = df[pd.notnull(df['Product'])]
-df['Product'] = df['Product'].apply(lambda x: x.upper())
-
-df = df.sort('Product')
-df.fillna(0, inplace=True) #replace na values with 0
-df = df[~df['Product'].str.contains("CAIRO")] #remove unnecessary rows
-df = df.reset_index().drop('index',1)
-df = df.groupby(['Product', 'Brand', 'Type'], axis=0, as_index=False).sum()
-
-#create a concatenated column and make index
-df['New name'] = df.apply(lambda x: str(x['Product']) +","+ str(x['Brand']) +","+ str(x['Type']), axis=1)
-df = df.set_index('New name')
-df.index.name = None
-
-#retrieve gross profit for each product date combination from old df
-for i in range(0, max(df2.index)+1):
-    df2.loc[i, 'Gross Profit'] = df.loc[df2.loc[i, 'New name'], df2.loc[i, 'Date']]
-    
-df2 = df2[['Product', 'Brand', 'Type', 'Date', 'Revenue', 'Gross Profit']]
-df2['Date'] = df2.Date.apply(lambda x: pd.to_datetime(datetime.strptime(x, '%b %Y')).date())
-
-gprofit = df2[['Product', 'Brand', 'Type', 'Date', 'Revenue' , 'Gross Profit']]
-
-total = gprofit['Revenue'].sum() #total revenue
-totalgp = gprofit['Gross Profit'].sum() #total gross profit
-gprofit['%Total Revenue'] = gprofit['Revenue'].apply(lambda x: x*100/total) #%total revenue
-totprods = max(gprofit.index) + 1
+total = df['Revenue'].sum(1) #total revenue
+df['%Total Revenue'] = df['Revenue'].apply(lambda x: x*100/total) #%total revenue
+totprods = max(df.index) + 1
 temp = total/totprods #total revenue / total products
-gprofit['Average Revenue'] = temp #avg revenue
-gprofit['Average Gross Profit'] = totalgp/totprods #avg gross profit
+df['Average Revenue'] = temp #avg revenue
 
-gprofit['% Variation from Average'] = gprofit['Revenue'].apply(lambda x: (x-temp)*100/temp)
-total = gprofit['Gross Profit'].sum()
-gprofit['%Total Gross Profit'] = gprofit['Gross Profit'].apply(lambda x: x*100/total)
+df = df[['Product', 'SKU', 'Date', 'Revenue', 'CMGR', 'Period', '%Total Revenue', 'Average Revenue']]
 
-df1 = pd.read_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products'])
-df1 = df1[['Product', 'Brand', 'Type', 'CMGR']]
-df1['Product'] = df1.apply(lambda x: str(x['Product']) +","+ str(x['Brand']) +","+ str(x['Type']), axis=1)
-df1 = df1[['Product', 'CMGR']]
-df1 = df1.set_index('Product')
-df1.index.name = None
-                                           
-# get CGMR for each product from products table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-gprofit['Newname'] = gprofit.apply(lambda x: str(x['Product']) +","+ str(x['Brand']) +","+ str(x['Type']), axis=1)
-for i in range(0, max(gprofit.index)+1):
-    gprofit.loc[i,'CMGR'] = df1.loc[gprofit.loc[i,'Newname'],'CMGR']
-    
-gprofit = gprofit[['Product', 'Brand', 'Type', 'Date', 'Revenue', 'Gross Profit', 'CMGR', 'Average Revenue', 'Average Gross Profit', '%Total Revenue', '% Variation from Average', '%Total Gross Profit']]
-gprofit=gprofit[gprofit['Revenue'] != 0] #remove products with zero revenue
-gprofit.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products_dates'], index=False)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+df.to_csv('C:\Users\saisree849\Documents\GitHub\NGS\\12_dashboard tables\output\products_dates.csv', index=False)
+
+df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products_dates'], index=False)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
