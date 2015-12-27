@@ -53,4 +53,4 @@ df = df[df.Count != 0]
 df = df.sort(['Count'], ascending=False).reset_index().drop('index', 1)
 
 
-df1.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_monthly_bought_together'])
+df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_monthly_bought_together'])
