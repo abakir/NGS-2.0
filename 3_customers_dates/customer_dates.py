@@ -55,12 +55,6 @@ def getHours(data):
         return 20
     elif(num >= 22):
         return 22
-        
-df['Day'] = df.Date1.apply(getDay)
-df['Hours'] = df.Date1.apply(getHours)
-
-df = df[['Name', 'Email', 'Date', 'Revenue', 'Day', 'Hours']]
-
 
 def changeDate(data):
     matchobj = re.match(r'(.*) (.*) (.*).*',data)
@@ -76,6 +70,13 @@ def changeDate(data):
         return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=2)
     if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Friday'):
         return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=1)
+        
+                        
+df['Day'] = df.Date1.apply(getDay)
+df['Hours'] = df.Date1.apply(getHours)
+
+df = df[['Name', 'Email', 'Date', 'Revenue', 'Day', 'Hours']]
+
 df['Date'] = df.Date.apply(changeDate)
 
 df = df.drop_duplicates().reset_index().drop('index',1)

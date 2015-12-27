@@ -9,16 +9,6 @@ with open("config.yaml", 'r') as ymlfile:
 
 df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["ip_orders"], low_memory=False)
 
-df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Lineitem quantity', 'Lineitem price']]
-df['Revenue'] = df['Lineitem quantity'] * df['Lineitem price']
-
-df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Revenue']]
-df.columns = ['Product', 'SKU', 'Date', 'Revenue']
-df['Product'] = df['Product'].apply(lambda x: x.upper())
-df['SKU'] = df['SKU'].apply(lambda x: str(x).upper())
-prods = df[['Product', 'SKU', 'Revenue']]
-df['Date1'] = df['Date']
-
 def changeDate(data):
     matchobj = re.match(r'(.*) (.*) (.*).*',data)
     if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Wednesday'):
@@ -35,15 +25,27 @@ def changeDate(data):
         return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=1)
     if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Thursday'):
         return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=0)
-df['Date'] = df.Date.apply(changeDate)
-
-df1 = df[['Product', 'SKU', 'Revenue', 'Date1']]
 
 def cutDate(data):
     matchobj = re.match(r'(.*) (.*) (.*).*',data)
     data = matchobj.group(1)
     matchobj = re.match(r'(.*)-(.*)-(.*).*',data)
     return matchobj.group(1) + "-" + matchobj.group(2) + "-01"
+
+df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Lineitem quantity', 'Lineitem price']]
+df['Revenue'] = df['Lineitem quantity'] * df['Lineitem price']
+
+df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Revenue']]
+df.columns = ['Product', 'SKU', 'Date', 'Revenue']
+df['Product'] = df['Product'].apply(lambda x: x.upper())
+df['SKU'] = df['SKU'].apply(lambda x: str(x).upper())
+prods = df[['Product', 'SKU', 'Revenue']]
+df['Date1'] = df['Date']
+
+df['Date'] = df.Date.apply(changeDate)
+
+df1 = df[['Product', 'SKU', 'Revenue', 'Date1']]
+
 df1['Date1'] = df1.Date1.apply(cutDate)
 
 df = df[['Product', 'SKU', 'Revenue', 'Date']]
@@ -92,7 +94,7 @@ for i in range(0, max(df.index)+1):
     df.loc[i, 'CMGR'] = final.loc[df.loc[i, 'New'], 'CMGR']
     df.loc[i, 'Period'] = final.loc[df.loc[i, 'New'], 'Period']
     
-total = df['Revenue'].sum(1) #total revenue
+total = df['Revenue'].sum() #total revenue
 df['%Total Revenue'] = df['Revenue'].apply(lambda x: x*100/total) #%total revenue
 totprods = max(df.index) + 1
 temp = total/totprods #total revenue / total products
