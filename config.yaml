@@ -1,4 +1,5 @@
-root: C:\Users\saisree849\Documents\GitHub\NGS-2.0\12_dashboard_tables
+root: /home/cloudera/Documents/12_dashboard_tables
+dir_logs: /logs
 dir_data_enodos: /data_input/enodos
 dir_data_shopify: /data_input/shopify
 dir_data_vend: /data_input/vend

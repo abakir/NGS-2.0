@@ -1,6 +1,6 @@
 import os
 
-f = open('./config.yaml', 'w')
+f = open('/home/cloudera/Documents/12_dashboard_tables/config.yaml', 'w')
 
 # root folder
 f.write("root: " + os.getcwd())

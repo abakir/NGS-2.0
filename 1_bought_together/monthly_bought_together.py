@@ -1,11 +1,28 @@
+#!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 import pandas as pd
 import re
 import yaml
+import logging
+import time
 
 with open("config.yaml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    cfg = yaml.load(ymlfile)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"], low_memory=False)
+# create logger
+logger = logging.getLogger(cfg['log_monthly_bought_together'])
+logger.setLevel(logging.DEBUG)
+# create console handler and set level to debug
+ch = logging.FileHandler(cfg['root'] + cfg['dir_logs'] + cfg['log_monthly_bought_together'] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".log" )
+ch.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# add formatter to ch
+ch.setFormatter(formatter)
+# add ch to logger
+logger.addHandler(ch)
+
+df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["ip_orders"], low_memory=False)
+logger.debug("Data Frame df created")
 
 #function to get month and year
 def convertDate(data):
