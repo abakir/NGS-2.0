@@ -6,6 +6,14 @@ import re
 import yaml
 import logging
 import time
+import os
+
+def make_sure_path_exists(path):
+    if (!os.path.isdir(path)):
+        os.makedirs(path)
+
+make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
+make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
 
 with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)

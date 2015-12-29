@@ -7,6 +7,11 @@ import re
 import yaml
 import logging
 import time
+import os
+
+def make_sure_path_exists(path):
+    if (!os.path.isdir(path)):
+        os.makedirs(path)
 
 with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
@@ -15,6 +20,7 @@ with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ym
 logger = logging.getLogger(cfg['log_customer_dates'])
 logger.setLevel(logging.DEBUG)
 # create console handler and set level to debug
+make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
 ch = logging.FileHandler(cfg['root'] + cfg['dir_logs'] + cfg['log_customer_dates'] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".log" )
 ch.setLevel(logging.DEBUG)
 # create formatter
@@ -161,5 +167,7 @@ customers.loc[:, 'Address'] = customers['Address1'] + " " + customers['Address2'
 customers = customers[['Name', 'Address', 'Phone', 'Email']]
 
 df3 = customers.merge(df3, on = ['Email'], how = 'inner')
+
+make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
 
 df3.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_customer_dates'], index=False)

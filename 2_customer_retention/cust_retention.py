@@ -6,6 +6,11 @@ import re
 import yaml
 import logging
 import time
+import os
+
+def make_sure_path_exists(path):
+    if (!os.path.isdir(path)):
+        os.makedirs(path)
 
 with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
@@ -14,6 +19,7 @@ with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ym
 logger = logging.getLogger(cfg['log_cust_retention'])
 logger.setLevel(logging.DEBUG)
 # create console handler and set level to debug
+make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
 ch = logging.FileHandler(cfg['root'] + cfg['dir_logs'] + cfg['log_cust_retention'] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".log" )
 ch.setLevel(logging.DEBUG)
 # create formatter
@@ -94,4 +100,5 @@ df3.loc[0, 'Total Count'] = max(df1.index) + 1
 df3.loc[0, 'Retention Rate'] = df3.loc[0, 'Cutomers 30 days']/float(df3.loc[0, 'Total Count'])
 df3.loc[0, 'Regular Customers'] = df3.loc[0, 'Cutomers 20 days']/float(df3.loc[0, 'Total Count'])
 
+make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
 df3.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_cust_retention'], index = False)

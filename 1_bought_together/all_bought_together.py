@@ -3,6 +3,11 @@ import pandas as pd
 import yaml
 import logging
 import time
+import os
+
+def make_sure_path_exists(path):
+    if (!os.path.isdir(path)):
+        os.makedirs(path)
 
 with open("config.yaml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
@@ -12,6 +17,7 @@ with open("config.yaml", 'r') as ymlfile:
 logger = logging.getLogger(cfg['log_all_bought_together'])
 logger.setLevel(logging.DEBUG)
 # create console handler and set level to debug
+make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
 ch = logging.FileHandler(cfg['root'] + cfg['dir_logs'] + cfg['log_all_bought_together'] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".log" )
 ch.setLevel(logging.DEBUG)
 # create formatter
@@ -68,5 +74,7 @@ df = df[['Product1', 'Product2', 'Count']]
 
 df = df[df.Count != 0]
 df = df.sort_values(by = ['Count'], ascending=False).reset_index().drop('index', 1)
+
+make_sure_path_exists(cfg['root'] + cfg['dir_data_output'] )
 
 df.to_csv(cfg['root'] + cfg['dir_data_output'] + cfg['op_all_bought_together'])
