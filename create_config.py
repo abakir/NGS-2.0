@@ -6,6 +6,7 @@ f = open('./config.yaml', 'w')
 f.write("root: " + os.getcwd())
 
 # subfolders
+f.write("\ndir_logs: /logs")
 f.write("\ndir_data_enodos: /data_input/enodos")
 f.write("\ndir_data_shopify: /data_input/shopify")
 f.write("\ndir_data_vend: /data_input/vend")

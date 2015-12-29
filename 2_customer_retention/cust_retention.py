@@ -28,13 +28,13 @@ def days_between(d1, d2):
     d2 = datetime.strptime(d2, "%Y-%m-%d")
     return (d2 - d1).days
     
-df['Date'] = df.Date.apply(convertDate) 
+df.loc[:, 'Date'] = df.Date.apply(convertDate) 
 df = df.drop_duplicates().reset_index().drop('index',1) #remove products with same names in single order
 
-df['YearBefore'] = (str)(datetime.now() - timedelta(days=366)) #366 days from today(Thursday)
-df['YearBefore'] = df.YearBefore.apply(convertNewDate) #call function
+df.loc[:, 'YearBefore'] = (str)(datetime.now() - timedelta(days=366)) #366 days from today(Thursday)
+df.loc[:, 'YearBefore'] = df.YearBefore.apply(convertNewDate) #call function
 
-df['DaysBetween'] = df.apply(lambda x: days_between(x['YearBefore'], x['Date']), axis=1)
+df.loc[:, 'DaysBetween'] = df.apply(lambda x: days_between(x['YearBefore'], x['Date']), axis=1)
 df = df[(df.DaysBetween <= 365) & (df.DaysBetween >= 0)] #get rows whose order is with in 365 days
 
 df1 = df[['Email']] #create new df with emails
@@ -42,25 +42,25 @@ df1 = df1.drop_duplicates().reset_index().drop('index',1)
 
 df2 = df[['Email', 'Date']] #create new df with emails, dates
 
-df['Days30Before'] = (str)(datetime.now() - timedelta(days=31)) #31 days from today(Thursday)
-df['Days30Before'] = df.Days30Before.apply(convertNewDate) 
+df.loc[:, 'Days30Before'] = (str)(datetime.now() - timedelta(days=31)) #31 days from today(Thursday)
+df.loc[:, 'Days30Before'] = df.Days30Before.apply(convertNewDate) 
 
-df2['Days20Before'] = (str)(datetime.now() - timedelta(days=21)) #21 days from today(Thursday)
-df2['Days20Before'] = df2.Days20Before.apply(convertNewDate) 
+df2.loc[:, 'Days20Before'] = (str)(datetime.now() - timedelta(days=21)) #21 days from today(Thursday)
+df2.loc[:, 'Days20Before'] = df2.Days20Before.apply(convertNewDate) 
 
-df['DaysBetween'] = df.apply(lambda x: days_between(x['Days30Before'], x['Date']), axis=1)
+df.loc[:, 'DaysBetween'] = df.apply(lambda x: days_between(x['Days30Before'], x['Date']), axis=1)
 df = df[(df.DaysBetween <= 30) & (df.DaysBetween >= 0)] #get rows whose order is with in 30 days
 
-df2['DaysBetween'] = df2.apply(lambda x: days_between(x['Days20Before'], x['Date']), axis=1)
-df2 = df2[(df2.DaysBetween <= 20) & (df2.DaysBetween >= 0)] #get rows whose order is with in 20 days
+df2.loc[:, 'DaysBetween'] = df2.apply(lambda x: days_between(x['Days20Before'], x['Date']), axis=1)
+df2 = df2[(df2.DaysBetween <= 20) & (df2.DaysBetween >= 0)] # get rows whose order is with in 20 days
 
 #count number of times a customer has ordered
-df['Count'] = 1
+df.loc[:, 'Count'] = 1
 df = df[['Email', 'Count']]
 df = df.groupby(['Email'], axis = 0, as_index=False).sum()
 
 #count number of times a customer has ordered
-df2['Count'] = 1
+df2.loc[:, 'Count'] = 1
 df2 = df2[['Email', 'Count']]
 df2 = df2.groupby(['Email'], axis = 0, as_index=False).sum()
 

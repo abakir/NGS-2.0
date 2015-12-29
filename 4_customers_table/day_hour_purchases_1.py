@@ -49,8 +49,8 @@ def getHours(data):
     elif(num >= 22):
         return 22
         
-df['Day'] = df.Date.apply(getDay)
-df['Hours'] = df.Date.apply(getHours)
+df.loc[:, 'Day'] = df.Date.apply(getDay)
+df.loc[:, 'Hours'] = df.Date.apply(getHours)
 
 df = df[['Name', 'Email', 'Day', 'Hours']]
 

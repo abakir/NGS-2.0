@@ -33,7 +33,7 @@ df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"],low_memory
 df1 = df[['Lineitem quantity', 'Lineitem price']]
 
 #calculate revenue
-df1['Revenue'] = df1.apply(lambda x: x['Lineitem quantity'] * x['Lineitem price'], axis=1)
+df1.loc[:, 'Revenue'] = df1.apply(lambda x: x['Lineitem quantity'] * x['Lineitem price'], axis=1)
 
 df1=df1[['Lineitem quantity', 'Revenue']]
 df = df[['Email']]

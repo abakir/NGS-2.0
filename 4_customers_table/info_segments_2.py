@@ -12,7 +12,7 @@ df = df[[ 'Email', 'Lineitem quantity', 'Lineitem price']]
 df.columns = ['Email', 'Quantity', 'Price']
 
 #calculate revenue
-df['Revenue'] = df['Quantity'] * df['Price']
+df.loc[:, 'Revenue'] = df['Quantity'] * df['Price']
 df = df[['Email', 'Revenue']]
 
 #calculate total revenue per customer
@@ -29,10 +29,10 @@ df1 = df1.groupby('Email', axis = 0, as_index=False).sum()
 df = df.merge(df1, on = ['Email'], how = 'inner')
 
 #calculate basket value
-df['Basket Value'] = df['Revenue'] / df['Orders']
+df.loc[:, 'Basket Value'] = df['Revenue'] / df['Orders']
 customer_value = df[['Email', 'Revenue', 'Basket Value']]
 
-customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"])
+customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"], low_memory=False)
 
 #concatenate name, address
 customers['Name'] = customers['First Name'] + " " + customers['Last Name']

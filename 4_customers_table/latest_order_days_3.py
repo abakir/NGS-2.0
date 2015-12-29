@@ -24,16 +24,16 @@ df1=df1.drop_duplicates().reset_index().drop('index',1)
 #rename columns
 df1.columns = ['Email', 'Date']
 
-df1['Date'] = df1.Date.apply(getDate)
+df1.loc[:, 'Date'] = df1.Date.apply(getDate)
 
 df1=df1.drop_duplicates().reset_index().drop('index',1)
 
 #get today's date in datetime format
 today = pd.to_datetime(datetime.strptime(time.strftime("%Y-%m-%d"), '%Y-%m-%d')).date()
 
-df1['Days'] = df1.Date.apply(diffDates)
+df1.loc[:, 'Days'] = df1.Date.apply(diffDates)
 
-df1 = df1.sort(['Email', 'Days'])
+df1 = df1.sort_values(by = ['Email', 'Days'])
 df1= df1.reset_index().drop('index',1)
 
 #get the email and the min days row

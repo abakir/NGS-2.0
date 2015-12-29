@@ -12,7 +12,7 @@ df = df[:max(df.index)-4]
 #remove null products, change to upper case
 df = df[pd.notnull(df['Product'])]
 df['Product'] = df['Product'].apply(lambda x: x.upper())
-df = df.sort('Product')
+df = df.sort_values(by = 'Product')
 df.fillna(0, inplace=True) #replace na values with 0
 df = df[~df['Product'].str.contains("CAIRO")] #remove unnecessary rows
 df = df.reset_index().drop('index',1)
@@ -43,14 +43,14 @@ gprofit = df[['Product', 'Brand', 'Type', 'Revenue' , 'Gross Profit', 'CMGR', 'P
 
 total = gprofit['Revenue'].sum() #total revenue
 totalgp = gprofit['Gross Profit'].sum() #total gross profit
-gprofit['%Total Revenue'] = gprofit['Revenue'].apply(lambda x: x*100/total) #%total revenue
+gprofit.loc[:, '%Total Revenue'] = gprofit['Revenue'].apply(lambda x: x*100/total) #%total revenue
 totprods = max(gprofit.index) + 1
 temp = total/totprods #total revenue / total products
-gprofit['Average Revenue'] = temp #avg revenue
-gprofit['Average Gross Profit'] = totalgp/totprods #avg gross profit
+gprofit.loc[:, 'Average Revenue'] = temp #avg revenue
+gprofit.loc[:, 'Average Gross Profit'] = totalgp/totprods #avg gross profit
 
-gprofit['% Variation from Average'] = gprofit['Revenue'].apply(lambda x: (x-temp)*100/temp)
+gprofit.loc[:, '% Variation from Average'] = gprofit['Revenue'].apply(lambda x: (x-temp)*100/temp)
 total = gprofit['Gross Profit'].sum()
-gprofit['%Total Gross Profit'] = gprofit['Gross Profit'].apply(lambda x: x*100/total)
+gprofit.loc[:, '%Total Gross Profit'] = gprofit['Gross Profit'].apply(lambda x: x*100/total)
 
 gprofit.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products'], index=False)

@@ -33,7 +33,7 @@ def cutDate(data):
     return matchobj.group(1) + "-" + matchobj.group(2) + "-01"
 
 df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Lineitem quantity', 'Lineitem price']]
-df['Revenue'] = df['Lineitem quantity'] * df['Lineitem price']
+df.loc[:, 'Revenue'] = df['Lineitem quantity'] * df['Lineitem price']
 
 df = df[['Lineitem name', 'Lineitem sku', 'Created at', 'Revenue']]
 df.columns = ['Product', 'SKU', 'Date', 'Revenue']
@@ -42,11 +42,11 @@ df['SKU'] = df['SKU'].apply(lambda x: str(x).upper())
 prods = df[['Product', 'SKU', 'Revenue']]
 df['Date1'] = df['Date']
 
-df['Date'] = df.Date.apply(changeDate)
+df.loc[:, 'Date'] = df.Date.apply(changeDate)
 
 df1 = df[['Product', 'SKU', 'Revenue', 'Date1']]
 
-df1['Date1'] = df1.Date1.apply(cutDate)
+df1.loc[:, 'Date1'] = df1.Date1.apply(cutDate)
 
 df = df[['Product', 'SKU', 'Revenue', 'Date']]
 df = df.groupby(['Date','Product', 'SKU'], as_index=False).sum()
@@ -61,9 +61,10 @@ final[['SKU']] = prods[['SKU']]
 final.fillna(0, inplace=True)
 
 final['New'] = final.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
-df1['New'] = df1.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
 final = final.set_index('New')
 final.index.name = None
+
+df1['New'] = df1.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
 
 for i in range(0, max(df1.index)+1):
     final.loc[df1.loc[i, 'New'],df1.loc[i, 'Date1']] = df1.loc[i, 'Revenue']
@@ -86,9 +87,9 @@ for i in range(0,max(final.index)+1):
 final = final[['Product', 'SKU', 'CMGR', 'Period']]
 
 final['New'] = final.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
-df['New'] = df.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
 final = final.set_index('New')
 final.index.name = None
+df['New'] = df.apply(lambda x: str(x['Product']) +","+ str(x['SKU']), axis=1)
 
 for i in range(0, max(df.index)+1):
     df.loc[i, 'CMGR'] = final.loc[df.loc[i, 'New'], 'CMGR']
@@ -98,10 +99,10 @@ total = df['Revenue'].sum() #total revenue
 df['%Total Revenue'] = df['Revenue'].apply(lambda x: x*100/total) #%total revenue
 totprods = max(df.index) + 1
 temp = total/totprods #total revenue / total products
-df['Average Revenue'] = temp #avg revenue
+df.loc[:, 'Average Revenue'] = temp #avg revenue
 
 df = df[['Product', 'SKU', 'Date', 'Revenue', 'CMGR', 'Period', '%Total Revenue', 'Average Revenue']]
 
-df.to_csv('C:\Users\saisree849\Documents\GitHub\NGS\\12_dashboard tables\output\products_dates.csv', index=False)
+#df.to_csv('C:\Users\saisree849\Documents\GitHub\NGS\\12_dashboard tables\output\products_dates.csv', index=False)
 
 df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products_dates'], index=False)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

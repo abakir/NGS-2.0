@@ -32,7 +32,7 @@ for a in x: #take each month
         b.append(a)
 df1['Date'] = pd.Series(b)
 
-df1['Date'] = df1.Date.apply(convertDate)
+df1.loc[:, 'Date'] = df1.Date.apply(convertDate)
 
 b = []
 for i in df3.columns: #get each month

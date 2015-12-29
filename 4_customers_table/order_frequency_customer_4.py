@@ -17,11 +17,11 @@ df1['Created at'] = df1.apply(lambda x: x['Created at'][:10], axis = 1)
 df1=df1.drop_duplicates().reset_index().drop('index',1)
 
 df1.columns=['Name','Email', 'Date']
-df1['Difference'] = 0
-df1['Total orders'] = 0
+df1.loc[:, 'Difference'] = 0
+df1.loc[:, 'Total orders'] = 0
 
-df1['Date'] =pd.to_datetime(df1.Date)
-df1=df1.sort(['Email', 'Date']).reset_index().drop('index',1)
+df1.loc[:, 'Date'] =pd.to_datetime(df1.Date)
+df1=df1.sort_values(by = ['Email', 'Date']).reset_index().drop('index',1)
 
 n = 1
 for i in range(0,max(df1.index)):
@@ -38,7 +38,7 @@ for i in range(0,max(df1.index)):
 df1 = df1.groupby('Email', axis=0, as_index=False).sum()
 
 #calculate average days between orders
-df1['Average days between orders'] = df1.apply(lambda x: x['Difference']/float(x['Total orders']), axis = 1)
+df1.loc[:, 'Average days between orders'] = df1.apply(lambda x: x['Difference']/float(x['Total orders']), axis = 1)
 df2 = df1[['Email', 'Total orders', 'Average days between orders']]
          
 df2.to_csv(cfg['root']+cfg['dir_customers_table']+cfg['io_order_frequency_customer_4'],index=False)

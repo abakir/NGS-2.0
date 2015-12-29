@@ -45,10 +45,10 @@ df = df[df.Product1 != df.Product2]
 
 df['newcol'] = df.apply(lambda x: combineProds(x['Product1'], x['Product2']), axis=1)
 df = df.drop_duplicates('newcol').reset_index().drop('index', 1)
-df['Count'] = df.apply(lambda x: len(list(set(x['Order1']).intersection(x['Order2']))), axis=1)
+df.loc[:, 'Count'] = df.apply(lambda x: len(list(set(x['Order1']).intersection(x['Order2']))), axis=1)
 df = df[['Product1', 'Product2', 'Count']]
 
 df = df[df.Count != 0]
-df = df.sort(['Count'], ascending=False).reset_index().drop('index', 1)
+df = df.sort_values(by = ['Count'], ascending=False).reset_index().drop('index', 1)
 
 df.to_csv(cfg['root'] + cfg['dir_data_output'] + cfg['op_all_bought_together'])

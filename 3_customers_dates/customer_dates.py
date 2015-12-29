@@ -7,12 +7,11 @@ import yaml
 with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"])
-
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"], low_memory=False)
 
 df = df[['Name', 'Email', 'Created at', 'Lineitem quantity', 'Lineitem price']]
 #calculate revenue
-df['Revenue'] = df.apply(lambda x: x['Lineitem quantity']*x['Lineitem price'], axis=1)
+df.loc[:, 'Revenue'] = df.apply(lambda x: x['Lineitem quantity']*x['Lineitem price'], axis=1)
 
 #get required columns and rename
 df = df[['Name', 'Email', 'Created at', 'Revenue']]
@@ -72,12 +71,12 @@ def changeDate(data):
         return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=1)
         
                         
-df['Day'] = df.Date1.apply(getDay)
-df['Hours'] = df.Date1.apply(getHours)
+df.loc[:, 'Day'] = df.Date1.apply(getDay)
+df.loc[:, 'Hours'] = df.Date1.apply(getHours)
 
 df = df[['Name', 'Email', 'Date', 'Revenue', 'Day', 'Hours']]
 
-df['Date'] = df.Date.apply(changeDate)
+df.loc[:, 'Date'] = df.Date.apply(changeDate)
 
 df = df.drop_duplicates().reset_index().drop('index',1)
 
@@ -105,7 +104,7 @@ df1.columns = ['Email', 'Date', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thu
 df5 = data[['Email', 'Date', 'Revenue']]
 df2 = data[['Email', 'Date']]
 df2 = df2.drop_duplicates().reset_index().drop('index',1)
-df2['Total orders'] = 1
+df2.loc[:, 'Total orders'] = 1
 df5 = df5.groupby(['Email', 'Date'], as_index=False).sum()
 df2 = df2.groupby(['Email', 'Date'], as_index=False).sum()
 
@@ -113,16 +112,16 @@ df2 = df2.groupby(['Email', 'Date'], as_index=False).sum()
 df3 = df2.merge(df5, on = ['Email', 'Date'], how = 'inner')
 
 #calculate basket value and join data frames
-df3['Basket Value'] = df3.apply(lambda x: x['Revenue']/float(x['Total orders']), axis=1)
+df3.loc[:, 'Basket Value'] = df3.apply(lambda x: x['Revenue']/float(x['Total orders']), axis=1)
 df3 = df3.merge(df1, on = ['Email', 'Date'], how = 'inner')
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"])
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"], low_memory=False)
 
 #get required columns
 df1 = df[['Lineitem quantity', 'Lineitem price']]
 
 #calculate revenue
-df1['Revenue'] = df1.apply(lambda x: x['Lineitem quantity'] * x['Lineitem price'], axis=1)
+df1.loc[:, 'Revenue'] = df1.apply(lambda x: x['Lineitem quantity'] * x['Lineitem price'], axis=1)
 
 #get required columns
 df1=df1[['Lineitem quantity', 'Revenue']]
@@ -132,14 +131,14 @@ df = df.drop_duplicates().reset_index().drop('index',1)
 
 #calculate avg revenue, avg basket size
 df1 = df1.sum()
-df3['Average Revenue'] = df1['Revenue']/float(max(df.index)+1)
-df3['Average Basket Size'] = df1['Lineitem quantity']/float(max(df.index)+1)
+df3.loc[:, 'Average Revenue'] = df1['Revenue']/float(max(df.index)+1)
+df3.loc[:, 'Average Basket Size'] = df1['Lineitem quantity']/float(max(df.index)+1)
 
-customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"])
+customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"], low_memory=False)
 
 #concatenate name, address
-customers['Name'] = customers['First Name'] + " " + customers['Last Name']
-customers['Address'] = customers['Address1'] + " " + customers['Address2'] + " " + customers['City']
+customers.loc[:, 'Name'] = customers['First Name'] + " " + customers['Last Name']
+customers.loc[:, 'Address'] = customers['Address1'] + " " + customers['Address2'] + " " + customers['City']
 
 customers = customers[['Name', 'Address', 'Phone', 'Email']]
 

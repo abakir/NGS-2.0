@@ -19,11 +19,11 @@ df1['Created at'] = df1.apply(lambda x: x['Created at'][:10], axis = 1)
 df1=df1.drop_duplicates().reset_index().drop('index',1)
 
 df1.columns=['Email', 'Date']
-df1['Difference'] = 0
-df1['Count'] = 0
+df1.loc[:, 'Difference'] = 0
+df1.loc[:, 'Count'] = 0
 
-df1['Date'] =pd.to_datetime(df1.Date)
-df1=df1.sort(['Email', 'Date']).reset_index().drop('index',1)
+df1.loc[:, 'Date'] =pd.to_datetime(df1.Date)
+df1=df1.sort_values(by = ['Email', 'Date']).reset_index().drop('index',1)
 
 n = 1
 for i in range(0,max(df1.index)):
@@ -39,7 +39,7 @@ for i in range(0,max(df1.index)):
 df1 = df1.groupby('Email', axis=0, as_index=False).sum()
 
 #calculate average days between orders
-df1['Average'] = df1.apply(lambda x: x['Difference']/float(x['Count']), axis = 1)
+df1.loc[:, 'Average'] = df1.apply(lambda x: x['Difference']/float(x['Count']), axis = 1)
 
 df2 = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"])
 df2 = df1.merge(df2, on = ['Email'], how = 'inner')
