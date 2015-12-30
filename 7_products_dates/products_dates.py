@@ -9,15 +9,15 @@ import logging
 import time
 import os
 
+with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+        
 def make_sure_path_exists(path):
-    if (!os.path.isdir(path)):
+    if (os.path.isdir(path) == False):
         os.makedirs(path)
 
 make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
 make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
-
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
 
 # create logger
 logger = logging.getLogger(cfg['log_products_dates'])
@@ -128,7 +128,5 @@ temp = total/totprods #total revenue / total products
 df.loc[:, 'Average Revenue'] = temp #avg revenue
 
 df = df[['Product', 'SKU', 'Date', 'Revenue', 'CMGR', 'Period', '%Total Revenue', 'Average Revenue']]
-
-#df.to_csv('C:\Users\saisree849\Documents\GitHub\NGS\\12_dashboard tables\output\products_dates.csv', index=False)
 
 df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products_dates'], index=False)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

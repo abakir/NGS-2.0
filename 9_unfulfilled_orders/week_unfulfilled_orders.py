@@ -9,15 +9,15 @@ import logging
 import time
 import os
 
+with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+        
 def make_sure_path_exists(path):
-    if (!os.path.isdir(path)):
+    if (os.path.isdir(path) == False):
         os.makedirs(path)
 
 make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
 make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
-
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
 
 # create logger
 logger = logging.getLogger(cfg['log_week_unfulfilled_orders'])
@@ -48,7 +48,7 @@ df1 = df.drop_duplicates('Name', keep = 'first').reset_index().drop('index', 1)
 
 #get todays date
 today = DT.date.today()
-dt = today - DT.timedelta(days=8) #Wednesday date
+dt = today - DT.timedelta(days=7) #Wednesday date
 df1.loc[:, 'Yes'] = df1.apply(lambda x: datetime.strptime(x['Created at'], '%Y-%m-%d').date() > dt, axis = 1) #update rows by comparing dates
 
 df2 = df1.loc[df1['Yes'] == True] #get orders within last week

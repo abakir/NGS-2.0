@@ -1,17 +1,20 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
+
 import pandas as pd
 import yaml
 import logging
 import time
 import os
 
+with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+        
 def make_sure_path_exists(path):
-    if (!os.path.isdir(path)):
+    if (os.path.isdir(path) == False):
         os.makedirs(path)
 
-with open("config.yaml", 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
-
+make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
+make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
 
 # create logger
 logger = logging.getLogger(cfg['log_all_bought_together'])

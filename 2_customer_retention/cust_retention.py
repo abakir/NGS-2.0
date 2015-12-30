@@ -8,12 +8,15 @@ import logging
 import time
 import os
 
-def make_sure_path_exists(path):
-    if (!os.path.isdir(path)):
-        os.makedirs(path)
-
 with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
+        
+def make_sure_path_exists(path):
+    if (os.path.isdir(path) == False):
+        os.makedirs(path)
+
+make_sure_path_exists(cfg['root'] + cfg['dir_logs'])
+make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
 
 # create logger
 logger = logging.getLogger(cfg['log_cust_retention'])
@@ -55,7 +58,7 @@ def days_between(d1, d2):
 df.loc[:, 'Date'] = df.Date.apply(convertDate) 
 df = df.drop_duplicates().reset_index().drop('index',1) #remove products with same names in single order
 
-df.loc[:, 'YearBefore'] = (str)(datetime.now() - timedelta(days=366)) #366 days from today(Thursday)
+df.loc[:, 'YearBefore'] = (str)(datetime.now() - timedelta(days=365)) #365 days from today(Wednesday)
 df.loc[:, 'YearBefore'] = df.YearBefore.apply(convertNewDate) #call function
 
 df.loc[:, 'DaysBetween'] = df.apply(lambda x: days_between(x['YearBefore'], x['Date']), axis=1)
@@ -66,10 +69,10 @@ df1 = df1.drop_duplicates().reset_index().drop('index',1)
 
 df2 = df[['Email', 'Date']] #create new df with emails, dates
 
-df.loc[:, 'Days30Before'] = (str)(datetime.now() - timedelta(days=31)) #31 days from today(Thursday)
+df.loc[:, 'Days30Before'] = (str)(datetime.now() - timedelta(days=30)) #30 days from today(Wednesday)
 df.loc[:, 'Days30Before'] = df.Days30Before.apply(convertNewDate) 
 
-df2.loc[:, 'Days20Before'] = (str)(datetime.now() - timedelta(days=21)) #21 days from today(Thursday)
+df2.loc[:, 'Days20Before'] = (str)(datetime.now() - timedelta(days=20)) #20 days from today(Wednesday)
 df2.loc[:, 'Days20Before'] = df2.Days20Before.apply(convertNewDate) 
 
 df.loc[:, 'DaysBetween'] = df.apply(lambda x: days_between(x['Days30Before'], x['Date']), axis=1)
