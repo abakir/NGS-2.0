@@ -96,6 +96,8 @@ def changeDate(data):
         return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=2)
     if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Friday'):
         return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=1)
+    if (pd.to_datetime(datetime.strptime(matchobj.group(1), '%Y-%m-%d')).date().strftime("%A") == 'Thursday'):
+        return datetime.strptime(matchobj.group(1), '%Y-%m-%d').date() - DT.timedelta(days=0)
         
                         
 df.loc[:, 'Day'] = df.Date1.apply(getDay)
@@ -104,8 +106,6 @@ df.loc[:, 'Hours'] = df.Date1.apply(getHours)
 df = df[['Name', 'Email', 'Date', 'Revenue', 'Day', 'Hours']]
 
 df.loc[:, 'Date'] = df.Date.apply(changeDate)
-
-df = df.drop_duplicates().reset_index().drop('index',1)
 
 data = df[['Email', 'Date', 'Revenue']]
 df = df[['Email', 'Date', 'Day', 'Hours']]

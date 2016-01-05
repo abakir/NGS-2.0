@@ -61,8 +61,9 @@ customer_value = df[['Email', 'Revenue', 'Basket Value']]
 customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"], low_memory=False)
 
 #concatenate name, address
-customers['Name'] = customers['First Name'] + " " + customers['Last Name']
-customers['Address'] = customers['Address1'] + " " + customers['Address2'] + " " + customers['City']
+customers.loc[:, 'Name'] = customers.loc[:, 'First Name'] + " " + customers.loc[:, 'Last Name']
+customers.loc[:, 'Address'] = customers.loc[:, 'Address1'] + " " + customers.loc[:, 'Address2'] + " " + customers.loc[:, 'City']
+
 
 customers = customers[['Name', 'Address', 'Phone', 'Email']]
 
