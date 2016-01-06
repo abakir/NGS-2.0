@@ -80,7 +80,7 @@ df1 = df1.groupby(['Date1','Product', 'SKU'], as_index=False).sum()
 prods = prods.groupby(['Product', 'SKU'], as_index=False).sum()
 prods = prods.drop_duplicates().reset_index().drop('index',1)
 
-final = pd.DataFrame(columns = ['Product', 'SKU'] + df1['Date1'].drop_duplicates().tolist()+ ['Revenue'] )
+final = pd.DataFrame(columns = ['Product', 'SKU'] + df1['Date1'].drop_duplicates().tolist()+ ['Revenue'] + ['CMGR'] + ['Period'])
 final[['Product']] = prods[['Product']]
 final[['Revenue']] = prods[['Revenue']]
 final[['SKU']] = prods[['SKU']]
@@ -104,7 +104,7 @@ for i in range(0,max(final.index)+1):
             t=1
             break
     #TO get the total no of months        
-    n=len(final.columns)-1-j
+    n=len(final.columns)-3-j
     m=n**(-1)
     y=final.loc[i, 'Revenue']/final.iloc[i,j]
     final.loc[i,'CMGR']=(pow(y,m)-1)*100
