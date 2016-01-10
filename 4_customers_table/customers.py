@@ -6,7 +6,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -41,7 +41,7 @@ df10 = df1.merge(df3, on = ['Email'], how = 'inner')
 df6 = df10.merge(df5, on = ['Email'], how = 'inner')
 df6 = df6.merge(df, on = ['Email'], how = 'outer')
 
-df2 = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"])
+df2 = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_customers"])
 df2 = df6.merge(df2, on = ['Email'], how = 'inner')
 
 df2 = df2[['First Name', 'Last Name', 'Total orders', 'Average days between orders', 'Email', 'Days from Last order', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '0:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00', '6:00 - 8:00', '8:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00', '18:00 - 20:00', '20:00 - 22:00', '22:00 - 0:00']]
@@ -54,7 +54,7 @@ df4 = df2.merge(df, on = ['Name', 'Email'], how = 'inner')
 
 df4 = df4[['Name', 'Revenue', 'Basket Value', 'Segment', 'Address','Phone', 'Total orders', 'Average days between orders', 'Email', 'Days from Last order', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '0:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00', '6:00 - 8:00', '8:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00', '18:00 - 20:00', '20:00 - 22:00', '22:00 - 0:00']]
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"],low_memory=False)
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_orders"],low_memory=False)
 df1 = df[['Lineitem quantity', 'Lineitem price']]
 
 #calculate revenue
@@ -69,9 +69,9 @@ df1 = df1.sum()
 df4['Average Revenue'] = df1['Revenue']/float(max(df.index)+1)
 df4['Average Basket Size'] = df1['Lineitem quantity']/float(max(df.index)+1)
 
-df3 = pd.read_csv(cfg['root']+cfg['dir_monthly_segments']+cfg['op_cust_score'])
+df3 = pd.read_csv(cfg['root']+cfg['dir_monthly_segments']+cfg['output_cust_score'])
 df3.columns = [u'Email', u'Beef', u'Dried fruits and nuts', u'Fresh Beef & Poultry', u'Fruits', u'General', u'Rice and pasta', u'Vegetables', u'Beverages', u'Cosmetics', u'Dairy', u'Food supplements', u'Grains_Seeds_Cereal', u'Herbs', u'Oil_ Vinegar_Sauces', u'Bakery', u'Condiments and paste', u'Poultry', u'Chocolate_cookies_snacks', u'Jams & spreads & honey', u'Non-dairy', u'Seafood', u'Gluten free', u'Herbal pharmacy', u'Tea and herbal drinks', u'Accessories', u'Lamb', u'Prepared food', u'Home appliance', u'Books']
 df4 = df4.merge(df3, on = ['Email'], how='left')
 
 df4[['Total orders', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '0:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00', '6:00 - 8:00', '8:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00', '18:00 - 20:00', '20:00 - 22:00', '22:00 - 0:00']] = df4[['Total orders', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '0:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00', '6:00 - 8:00', '8:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00', '18:00 - 20:00', '20:00 - 22:00', '22:00 - 0:00']].astype(float)
-df4.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_customers'],index = False)
+df4.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_customers'],index = False)

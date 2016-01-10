@@ -9,7 +9,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -32,7 +32,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"],low_memory=False)
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_orders"],low_memory=False)
 logger.debug("Data Frame df created")
 
 df = df[['Name', 'Fulfillment Status', 'Created at']]
@@ -61,4 +61,4 @@ df2.loc[:, 'Unfulfilled'] = df2.apply(lambda x: 1 if x['Fulfillment Status'] == 
 df2 = df2.groupby(['Created at'], axis=0, as_index=False).sum() #count total unfulfilled orders
 df2.loc[:, '% Unfulfilled'] = df2.apply(lambda x: x['Unfulfilled']*100/float(x['All']), axis = 1)
 
-df2.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_week_unfulfilled_orders'], index = False)
+df2.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_week_unfulfilled_orders'], index = False)

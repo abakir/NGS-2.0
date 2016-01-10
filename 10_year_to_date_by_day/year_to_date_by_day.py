@@ -8,7 +8,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -31,7 +31,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["ip_total_revenue_daily"])
+df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["input_total_revenue_daily"])
 logger.debug("Data Frame df created")
 
 #get date
@@ -52,4 +52,4 @@ df = df[:max(df.index)-4]
 df.columns = ['Date', 'Revenue', 'Cost of Goods', 'Gross Profit', 'Margin']
 
 df.loc[:, 'Date'] = df.Date.apply(convertDate)
-df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_year_to_date_by_day'], index = False)
+df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_year_to_date_by_day'], index = False)

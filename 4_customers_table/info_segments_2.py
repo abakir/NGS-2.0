@@ -6,7 +6,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -29,7 +29,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"],low_memory=False)
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_orders"],low_memory=False)
 logger.debug("Data Frame df created")
 df1 = df
 
@@ -58,7 +58,7 @@ df = df.merge(df1, on = ['Email'], how = 'inner')
 df.loc[:, 'Basket Value'] = df['Revenue'] / df['Orders']
 customer_value = df[['Email', 'Revenue', 'Basket Value']]
 
-customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"], low_memory=False)
+customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_customers"], low_memory=False)
 
 #concatenate name, address
 customers.loc[:, 'Name'] = customers.loc[:, 'First Name'] + " " + customers.loc[:, 'Last Name']

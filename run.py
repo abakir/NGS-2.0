@@ -3,7 +3,7 @@
 import yaml
 import os
 import sys
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 
 execfile(os.path.join(cfg['root']+cfg['dir_bought_together']+cfg['file_all_bought_together']))

@@ -7,7 +7,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -30,7 +30,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["ip_total_revenue_type"])
+df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["input_total_revenue_type"])
 logger.debug("Data Frame df created")
 
 def convertDate(data):
@@ -65,7 +65,7 @@ for i in df3.columns: #get each month
     a = df[i].tolist() #each month column to list
     b = b + a
 df1['Revenue'] = pd.Series(b)
-df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["ip_gross_profit_type"])
+df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["input_gross_profit_type"])
 df = df[:max(df.index)-4]
 df = df[range(0,len(df.columns)-5)]
 
@@ -78,4 +78,4 @@ for i in df3.columns: #get each month
     b = b + a
 df1['Gross Profit'] = pd.Series(b)
 
-df1.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_revenue_by_type'], index = False)
+df1.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_revenue_by_type'], index = False)

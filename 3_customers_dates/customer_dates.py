@@ -9,7 +9,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("/config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -33,7 +33,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"], low_memory=False)
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_orders"], low_memory=False)
 logger.debug("Data Frame df created")
 
 df = df[['Name', 'Email', 'Created at', 'Lineitem quantity', 'Lineitem price']]
@@ -142,7 +142,7 @@ df3 = df2.merge(df5, on = ['Email', 'Date'], how = 'inner')
 df3.loc[:, 'Basket Value'] = df3.apply(lambda x: x['Revenue']/float(x['Total orders']), axis=1)
 df3 = df3.merge(df1, on = ['Email', 'Date'], how = 'inner')
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"], low_memory=False)
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_orders"], low_memory=False)
 
 #get required columns
 df1 = df[['Lineitem quantity', 'Lineitem price']]
@@ -161,7 +161,7 @@ df1 = df1.sum()
 df3.loc[:, 'Average Revenue'] = df1['Revenue']/float(max(df.index)+1)
 df3.loc[:, 'Average Basket Size'] = df1['Lineitem quantity']/float(max(df.index)+1)
 
-customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"], low_memory=False)
+customers = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_customers"], low_memory=False)
 
 #concatenate name, address
 customers.loc[:, 'Name'] = customers['First Name'] + " " + customers['Last Name']
@@ -173,4 +173,4 @@ df3 = customers.merge(df3, on = ['Email'], how = 'inner')
 
 make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
 
-df3.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_customer_dates'], index=False)
+df3.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_customer_dates'], index=False)

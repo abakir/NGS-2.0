@@ -7,7 +7,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -31,7 +31,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["ip_orders"], low_memory=False)
+df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["input_orders"], low_memory=False)
 logger.debug("Data Frame df created")
 
 #function to get month and year
@@ -80,4 +80,4 @@ df = df[df.Count != 0]
 df = df.sort_values(by = ['Count'], ascending=False).reset_index().drop('index', 1)
 
 make_sure_path_exists(cfg['root']+cfg['dir_data_output'])
-df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_monthly_bought_together'])
+df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_monthly_bought_together'])

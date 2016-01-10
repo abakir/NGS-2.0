@@ -6,7 +6,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -29,7 +29,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["ip_total_revenue_prod"])
+df = pd.read_csv(cfg['root']+cfg['dir_data_vend']+cfg["input_total_revenue_prod"])
 logger.debug("Data Frame df created")
 
 #remove the last rows which are aggregated values
@@ -79,4 +79,4 @@ gprofit.loc[:, '% Variation from Average'] = gprofit['Revenue'].apply(lambda x: 
 total = gprofit['Gross Profit'].sum()
 gprofit.loc[:, '%Total Gross Profit'] = gprofit['Gross Profit'].apply(lambda x: x*100/total)
 
-gprofit.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products'], index=False)
+gprofit.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_products'], index=False)

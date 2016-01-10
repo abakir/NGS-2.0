@@ -9,7 +9,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -32,7 +32,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["ip_orders"], low_memory=False)
+df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["input_orders"], low_memory=False)
 logger.debug("Data Frame df created")
 
 def changeDate(data):
@@ -129,4 +129,4 @@ df.loc[:, 'Average Revenue'] = temp #avg revenue
 
 df = df[['Product', 'SKU', 'Date', 'Revenue', 'CMGR', 'Period', '%Total Revenue', 'Average Revenue']]
 
-df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_products_dates'], index=False)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+df.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_products_dates'], index=False)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

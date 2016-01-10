@@ -7,7 +7,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -30,7 +30,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_orders"],low_memory=False)
+df = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_orders"],low_memory=False)
 logger.debug("Data Frame df created")
 
 # take required fields
@@ -67,7 +67,7 @@ df1 = df1.groupby('Email', axis=0, as_index=False).sum()
 #calculate average days between orders
 df1.loc[:, 'Average'] = df1.apply(lambda x: x['Difference']/float(x['Count']), axis = 1)
 
-df2 = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["ip_customers"])
+df2 = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_customers"])
 df2 = df1.merge(df2, on = ['Email'], how = 'inner')
 
 
@@ -89,4 +89,4 @@ df4.iloc[4, 1] = np.compress((30 <= a) & (a < 60), a).size
 df4.iloc[5, 1] = np.compress((60 <= a) & (a < 100), a).size
 df4.iloc[6, 1] = np.compress((100 <= a), a).size
 
-df4.to_csv(cfg['root']+cfg['dir_data_output']+cfg['op_order_frequency'], index = False)
+df4.to_csv(cfg['root']+cfg['dir_data_output']+cfg['output_order_frequency'], index = False)

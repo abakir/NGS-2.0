@@ -6,7 +6,7 @@ import logging
 import time
 import os
 
-with open("/home/cloudera/Documents/12_dashboard_tables/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):
@@ -30,7 +30,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["ip_orders"], low_memory=False)
+df = pd.read_csv(cfg['root'] + cfg['dir_data_shopify'] + cfg["input_orders"], low_memory=False)
 logger.debug("Data Frame df created")
 
 # rows of type 21 and 12 are same, retain one instance of such rows
@@ -80,4 +80,4 @@ df = df.sort_values(by = ['Count'], ascending=False).reset_index().drop('index',
 
 make_sure_path_exists(cfg['root'] + cfg['dir_data_output'] )
 
-df.to_csv(cfg['root'] + cfg['dir_data_output'] + cfg['op_all_bought_together'])
+df.to_csv(cfg['root'] + cfg['dir_data_output'] + cfg['output_all_bought_together'])
