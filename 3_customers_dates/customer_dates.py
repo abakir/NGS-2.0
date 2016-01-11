@@ -1,5 +1,20 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Inputs refresh frequency : Weekly
+
+# Input1 : data_input/shopify/export_orders.csv
+# Input2 : data_input/shopify/customers_export.csv
+# Output : data_output/customer_dates.csv
+# Purpose : Gives customer details and their order statistics like 
+# Revenue, Basket value, Total Orders, etc for every week.
+# Sunday - Saturday gives number of orders made on each day of that week.
+# 00:00 - 00:00 gives number of orders made in each time interval.
+# Average Revenue = Total revenue / number of customers
+# Average Basket size = Total quantity / number of customers
+
 import pandas as pd
 from datetime import datetime
 import datetime as DT
@@ -9,7 +24,7 @@ import logging
 import time
 import os
 
-with open("/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):

@@ -1,5 +1,14 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input : data_input/shopify/orders_export.csv
+# Output : data_output/yr_unfulfilled_orders.csv
+# Purpose : Gives total orders, unfulfilled orders, %unfulfilled orders for each month of the year
+
 import pandas as pd
 import re
 from datetime import datetime

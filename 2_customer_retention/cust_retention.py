@@ -1,5 +1,16 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input : data_input/shopify/export_orders.csv
+# Output : data_output/cust_retention.csv
+# Purpose : Gives Retention rate, regular customers ratio
+# Retention rate = customers in last 30 days (Ordered more than once) / total customers
+# Regular customers = customers in last 20 days / total customers
+
 import pandas as pd
 from datetime import datetime, timedelta
 import re

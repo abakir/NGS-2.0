@@ -1,5 +1,18 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input(1-2) refresh frequency : Weekly
+# Input3 refresh frequency : Constant
+
+# Input1 : data_input/shopify/export_orders.csv
+# Input2 : data_input/shopify/customers_export.csv
+# Input3 : data_input/enodos/segments.csv
+# Output : 4_customers_table/info_segments_2.csv
+# Purpose : Gives customer details along with thier segment, total revenue, total basket value
+# Basket value  =  total revenue / number of orders
+
 import pandas as pd
 import yaml
 import logging

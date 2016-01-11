@@ -1,5 +1,14 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input : data_input/shopify/export_orders.csv
+# Output : data_output/all_bought_together.csv
+# Purpose : Gives the number of times products are bought in pairs during the whole period
+
 import pandas as pd
 import yaml
 import logging

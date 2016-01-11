@@ -1,5 +1,14 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input : data_input/vend/vend-total_revenue-sales_summary-by-day.csv
+# Output : data_output/year_to_date_by_day.csv
+# Purpose : Gives Revenue, Cost of goods, Gross Profit, Marigin for each day of the year
+
 import pandas as pd
 import re
 from datetime import datetime

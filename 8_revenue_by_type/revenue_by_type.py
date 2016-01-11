@@ -1,5 +1,15 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Inputs refresh frequency : Weekly
+
+# Input1 : data_input/vend/vend-total_revenue-for-type-by-month.csv
+# Input2 : data_input/vend/vend-gross_profit-for-type-by-month.csv
+# Output : data_output/revenue_by_type.csv
+# Purpose : Gives the revenue, gross profit of each type of product for each month
+
 import pandas as pd
 from datetime import datetime
 import yaml

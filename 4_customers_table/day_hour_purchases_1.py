@@ -1,5 +1,14 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input : data_input/shopify/export_orders.csv
+# Output : 4_customers_table/day_hour_purchases_1.csv
+# Purpose : Gives the count of orders made by each customer on each day of the week and every time interval.
+
 import pandas as pd
 from datetime import datetime
 import re

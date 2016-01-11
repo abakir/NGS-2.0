@@ -1,5 +1,14 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Inputs refresh frequency : Weekly
+
+# Input : data_input/shopify/export_orders.csv
+# Output : data_output/order_frequency.csv
+# Purpose : Gives the count of customers whose average days between orders fall in the given ranges
+
 import pandas as pd
 import numpy as np
 import yaml
@@ -67,11 +76,7 @@ df1 = df1.groupby('Email', axis=0, as_index=False).sum()
 #calculate average days between orders
 df1.loc[:, 'Average'] = df1.apply(lambda x: x['Difference']/float(x['Count']), axis = 1)
 
-df2 = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_customers"])
-df2 = df1.merge(df2, on = ['Email'], how = 'inner')
-
-
-df2 = df2[['Average']]
+df2 = df1[['Average']]
 df2 = df2[df2.Average != 0] #retain average > 0
 df2 = df2.reset_index().drop('index',1)
 a = df2['Average'].tolist()

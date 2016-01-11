@@ -1,12 +1,21 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input : data_input/shopify/export_orders.csv
+# Output : 4_customers_table/order_frequency_customer_4.csv
+# Purpose : Gives the total orders made by the customer and average days between orders
+
 import pandas as pd
 import yaml
 import logging
 import time
 import os
 
-with open("/config.yaml", 'r') as ymlfile:
+with open("config.yaml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
         
 def make_sure_path_exists(path):

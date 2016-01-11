@@ -1,5 +1,18 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input : data_input/shopify/orders_export.csv
+# Output : data_output/products_dates.csv
+# Purpose : Gives the product details along with revenue, % total revenue, average revenue on weekly basis along with CMGR, period
+# CMGR = ((1st month revenue/total revenue)^(1/period)-1)*100
+# period = number of months from the month product is sold till now
+# % Total Revenue = revenue of the product for that week *100/total
+# Average Revenue = total / number of products
+
 import pandas as pd
 from datetime import datetime
 import re

@@ -1,5 +1,21 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input refresh frequency : Weekly
+
+# Input1 : data_input/vend/vend-total_revenue-for-product_variant-by-month.csv
+# Output : data_output/products.csv
+# Purpose : Gives product details along with measurements like Revenue, Gross profit, 
+# CMGR, period for calculating CMGR, % Total Revenue, Average Revenue, Average Gross Profit, 
+# % Variation from Average, % Total Gross Profit
+# CMGR = ((1st month revenue/total revenue)^(1/period)-1)*100
+# period = number of months from the month product is sold till now
+# % Total Revenue, % Total Gross Profit = measure of that product*100/total
+# Average Revenue, Average Gross Profit = total / number of products
+# % Variation from average = (revenue of the product - average revenue)*100/ average revenue
+
 import pandas as pd
 import yaml
 import logging

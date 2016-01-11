@@ -1,5 +1,21 @@
 #!/home/cloudera/local/lib/python2.6/site-packages/bin/python
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : Weekly
+# Input(1-6) refresh frequency : Weekly
+# Input7 refresh frequency : Monthly
+
+# Input1 : 4_customers_table/info_segments_2.csv
+# Input2 : 4_customers_table/latest_order_days_3.csv
+# Input3 : 4_customers_table/order_frequency_customer_4.csv
+# Input4 : 4_customers_table/day_hour_purchases_1.csv
+# Input5 : data_input/shopify/customers_export.csv
+# Input6 : data_input/shopify/export_orders.csv
+# Input7 : 11_monthly_segments/cust_score.csv
+# Output : data_output/customers.csv
+# Purpose : Joins all the customer statistics from input files and also gives the score of each customer for each segment
+
 import pandas as pd
 import yaml
 import logging
@@ -45,7 +61,7 @@ df2 = pd.read_csv(cfg['root']+cfg['dir_data_shopify']+cfg["input_customers"])
 df2 = df6.merge(df2, on = ['Email'], how = 'inner')
 
 df2 = df2[['First Name', 'Last Name', 'Total orders', 'Average days between orders', 'Email', 'Days from Last order', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '0:00 - 2:00', '2:00 - 4:00', '4:00 - 6:00', '6:00 - 8:00', '8:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00', '18:00 - 20:00', '20:00 - 22:00', '22:00 - 0:00']]
-
+df2.fillna('',inplace=True)
 #concatenate name
 for i in range(0, max(df2.index)+1):
     df2.loc[i, 'Name'] = df2.loc[i, 'First Name'] + " " + df2.loc[i, 'Last Name']
