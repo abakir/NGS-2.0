@@ -1,5 +1,12 @@
 import os
 
+# Author : Sai Sree Kamineni
+# Date created : Jan 10, 2016
+# Execution frequency : When the environment is changed
+
+# Output file : config.yaml
+# Purpose : To create configuration file
+
 f = open('config.yaml', 'w')
 
 # root folder
